@@ -1,0 +1,9 @@
+// 1. Configuration and helpers
+@import 'abstracts';
+
+// 2. Bootstrap with optimized imports
+@import 'bootstrap/bootstrap';
+@import 'bootstrap/breakpoints';
+@import 'bootstrap/theme';
+@import 'bootstrap/overrides';
+@import 'bootstrap/typography';
