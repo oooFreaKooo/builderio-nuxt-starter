@@ -1,46 +1,56 @@
 <template>
-    <div v-if="canShowContent">
-        <Content
-            :api-key="apiKey"
-            :model="model"
-            :content="content"
-        />
-    </div>
-    <div v-else>
-        Content not Found
-    </div>
-    <div>
-        <NuxtLink to="/">
-            Home
-        </NuxtLink>
+    <div id="home">
+        <div>Hello world from your Vue project. Below is Builder Content:</div>
+
+        <div v-if="content || isPreviewing()">
+            <div>
+                page title:
+                {{ content?.data?.title || 'Unpublished' }}
+            </div>
+            <Content
+                model="page"
+                :content="content"
+                :api-key="BUILDER_PUBLIC_API_KEY"
+                :custom-components="REGISTERED_COMPONENTS"
+            />
+        </div>
+        <div v-else>
+            Content not Found
+        </div>
     </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { Content, fetchOneEntry, isPreviewing } from '@builder.io/sdk-vue'
+import HelloTest from '@/components/HelloTest.vue'
+
+const REGISTERED_COMPONENTS = [
+    {
+        component: HelloTest,
+        name: 'MyFunComponent',
+        canHaveChildren: true,
+        inputs: [
+            {
+                name: 'text',
+                type: 'string',
+                defaultValue: 'World',
+            },
+        ],
+    },
+]
+
+const BUILDER_PUBLIC_API_KEY = '6ea055df5e7943089f8644c8cc89c7f9'
 
 const route = useRoute()
 
-// TO DO: Add your Public API Key here
-const apiKey = '6ea055df5e7943089f8644c8cc89c7f9'
-const canShowContent = ref(false)
-const model = 'page'
-
-const { data: content } = await useAsyncData('builderData', () =>
+// fetch builder content data
+const { data: content } = await useAsyncData(`builderData-page-${route.path}`, () =>
     fetchOneEntry({
-        model,
-        apiKey,
+        model: 'page',
+        apiKey: BUILDER_PUBLIC_API_KEY,
         userAttributes: {
             urlPath: route.path,
         },
     }),
 )
-
-canShowContent.value = content.value ? true : isPreviewing(route.path)
 </script>
-
-<style scoped>
-.services-page {
-  overflow-x: hidden;
-}
-</style>
